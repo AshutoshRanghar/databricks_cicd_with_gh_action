@@ -10,8 +10,10 @@
       "whl": "dbfs:/FileStore/wheels/pyspark_project-1.0.0-py3-none-any.whl"
     }
   ],
-  "spark_python_task": {
-    "python_file": "pyspark_project.etl_job"
+  "python_wheel_task": {
+    "package_name": "pyspark-project",
+    "entry_point": "etl_job",
+    "parameters": []
   },
   "max_concurrent_runs": 1
 }
