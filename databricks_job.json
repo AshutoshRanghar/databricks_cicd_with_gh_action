@@ -11,7 +11,7 @@
     }
   ],
   "spark_python_task": {
-    "python_file": "pyspark_project/etl_job.py"
+    "python_file": "pyspark_project.etl_job"
   },
   "max_concurrent_runs": 1
 }

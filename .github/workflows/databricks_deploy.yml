@@ -1,62 +1,63 @@
-name: Build and Deploy PySpark Project to Databricks
+name: Deploy PySpark Project to Databricks
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repository
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      # 1️⃣ Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      # Step 2: Set up Python
+      # 2️⃣ Set up Python
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      # Step 3: Install dependencies
+      # 3️⃣ Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
           pip install -r requirements.txt
 
-      # Step 4: Build wheel file
-      - name: Build wheel file
-        run: python setup.py bdist_wheel
+      # 4️⃣ Build the .whl package
+      - name: Build wheel package
+        run: |
+          python setup.py bdist_wheel
+          echo "Built wheel:"
+          ls -lh dist/
 
-      # Step 5: Install jq (JSON parsing tool)
-      - name: Install jq
-        run: sudo apt-get install -y jq
+      # 5️⃣ Install Databricks CLI
+      - name: Install Databricks CLI
+        run: |
+          pip install databricks-cli==0.18.0
 
-      # Step 6: Upload .whl and Deploy Databricks Job
-      - name: Upload and Deploy Databricks Job
+      # 6️⃣ Configure Databricks CLI auth
+      - name: Configure Databricks CLI
+        run: |
+          mkdir -p ~/.databricks
+          echo "[DEFAULT]" > ~/.databricks/config
+          echo "host = $DATABRICKS_HOST" >> ~/.databricks/config
+          echo "token = $DATABRICKS_TOKEN" >> ~/.databricks/config
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+
+      # 7️⃣ Upload the wheel to DBFS
+      - name: Upload wheel to DBFS
         run: |
-          # Install the latest new Databricks CLI
-          pip install databricks-cli==0.18.0
+          WHEEL_PATH=$(ls dist/*.whl | head -n 1)
+          echo "Uploading $WHEEL_PATH to DBFS..."
+          databricks fs cp "$WHEEL_PATH" dbfs:/FileStore/wheels/ --overwrite
 
-          # Upload the wheel file to DBFS
-          WHL_PATH=$(ls dist/*.whl)
-          echo "Uploading wheel: $WHL_PATH"
-          databricks fs cp $WHL_PATH dbfs:/FileStore/wheels/ --overwrite
-
-          # Get job name from JSON
-          JOB_NAME=$(jq -r '.name' databricks_job.json)
-
-          # Check if job exists
-          JOB_ID=$(databricks jobs list --output json | jq -r ".jobs[] | select(.settings.name==\"$JOB_NAME\") | .job_id")
-
-          if [ -z "$JOB_ID" ]; then
-            echo "Job not found. Creating a new job: $JOB_NAME"
-            databricks jobs create --json "$(cat databricks_job.json)"
-          else
-            echo "Job $JOB_NAME exists (ID: $JOB_ID). Updating..."
-            databricks jobs reset --job-id $JOB_ID --json "$(cat databricks_job.json)"
-          fi
+      # 8️⃣ Deploy (create or overwrite) Databricks job
+      - name: Deploy Databricks job
+        run: |
+          databricks jobs create --json-file databricks_job.json || \
+          databricks jobs reset --job-id $(databricks jobs list --output JSON | jq -r '.jobs[] | select(.settings.name=="PySpark_ETL_Job") | .job_id') --json-file databricks_job.json
