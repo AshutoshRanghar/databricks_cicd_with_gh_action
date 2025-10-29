@@ -53,12 +53,24 @@ jobs:
           echo "Creating or updating Databricks job..."
           databricks jobs create --json @databricks_job.json || echo "Job already exists"
 
-      # 7️⃣ (Optional) Run job immediately
-      - name: Run Databricks Job
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-        run: |
-          JOB_ID=$(databricks jobs list --output json | jq -r '.jobs[] | select(.name=="PySpark_ETL_Job") | .id')
-          echo "Running job $JOB_ID..."
-          databricks jobs run-now --job-id "$JOB_ID"
+#      # 7️⃣ (Optional) Run job immediately
+#      - name: Run Databricks Job
+#        env:
+#          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+#          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+#        run: |
+#          JOB_ID=$(databricks jobs list --output json | jq -r '.jobs[] | select(.name=="PySpark_ETL_Job") | .id')
+#          echo "Running job $JOB_ID..."
+#          databricks jobs run-now --job-id "$JOB_ID"
+
+
+    # 7️⃣ Run job immediately
+    - name: Run Databricks Job
+      env:
+        DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+        DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+      run: |
+        # The 'jobs list' command returns 'job_id', not 'id'.
+        JOB_ID=$(databricks jobs list --output json | jq -r '.jobs[] | select(.name=="PySpark_ETL_Job") | .job_id')
+        echo "Running job $JOB_ID..."
+        databricks jobs run-now --job-id "$JOB_ID"
