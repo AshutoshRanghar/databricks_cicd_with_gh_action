@@ -1,0 +1,25 @@
+# Core Spark
+pyspark>=3.3.0
+delta-spark>=2.4.0
+
+# Packaging
+setuptools>=58.0.0
+wheel>=0.40.0
+
+# Databricks integration (CLI + API)
+databricks-cli>=0.18.0
+
+# Config / YAML handling
+PyYAML>=6.0
+
+# Data utilities
+pandas>=2.0.0
+numpy>=1.23.0
+
+# Testing
+pytest>=7.0.0
+pytest-mock>=3.10.0
+
+# Code style & linting (optional but good CI hygiene)
+black>=24.0.0
+flake8>=6.0.0
