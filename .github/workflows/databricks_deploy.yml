@@ -38,15 +38,6 @@ jobs:
           echo "CLI installed successfully"
           databricks --version
 
-      # 5️⃣ Configure Databricks CLI for Jobs API 2.1
-      - name: Configure Databricks CLI (Jobs API 2.1)
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-        run: |
-          databricks configure --host "$DATABRICKS_HOST" --token "$DATABRICKS_TOKEN"
-          databricks jobs configure --version=2.1
-
       # 6️⃣ Upload wheel to DBFS
       - name: Upload wheel to DBFS
         env:
