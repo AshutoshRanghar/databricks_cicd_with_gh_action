@@ -51,6 +51,9 @@ jobs:
 
       # 7️⃣ Upload the wheel to DBFS
       - name: Upload wheel to DBFS
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
           WHEEL_PATH=$(ls dist/*.whl | head -n 1)
           echo "Uploading $WHEEL_PATH to DBFS..."
