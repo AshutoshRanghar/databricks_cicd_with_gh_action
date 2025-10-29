@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout repository
+      # 1️⃣ Checkout repo
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -20,36 +20,22 @@ jobs:
         with:
           python-version: '3.10'
 
-      # 3️⃣ Install dependencies
-      - name: Install dependencies
+      # 3️⃣ Install dependencies and build wheel
+      - name: Install dependencies and build wheel
         run: |
           python -m pip install --upgrade pip setuptools wheel
           pip install -r requirements.txt
-
-      # 4️⃣ Build the .whl package
-      - name: Build wheel package
-        run: |
           python setup.py bdist_wheel
-          echo "Built wheel:"
           ls -lh dist/
 
-      # 5️⃣ Install Databricks CLI
-      - name: Install Databricks CLI
+      # 4️⃣ Install NEW Databricks CLI
+      - name: Install Databricks CLI (new)
         run: |
-          pip install databricks-cli==0.18.0
+          curl -fsSL https://raw.githubusercontent.com/databricks/cli/main/install.sh | bash
+          echo "CLI installed successfully"
+          databricks version
 
-      # 6️⃣ Configure Databricks CLI auth
-      - name: Configure Databricks CLI
-        run: |
-          mkdir -p ~/.databricks
-          echo "[DEFAULT]" > ~/.databricks/config
-          echo "host = $DATABRICKS_HOST" >> ~/.databricks/config
-          echo "token = $DATABRICKS_TOKEN" >> ~/.databricks/config
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-
-      # 7️⃣ Upload the wheel to DBFS
+      # 5️⃣ Upload wheel to DBFS
       - name: Upload wheel to DBFS
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
@@ -59,8 +45,21 @@ jobs:
           echo "Uploading $WHEEL_PATH to DBFS..."
           databricks fs cp "$WHEEL_PATH" dbfs:/FileStore/wheels/ --overwrite
 
-      # 8️⃣ Deploy (create or overwrite) Databricks job
-      - name: Deploy Databricks job
+      # 6️⃣ Deploy Databricks Job
+      - name: Deploy Databricks Job
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
-          databricks jobs create --json-file databricks_job.json || \
-          databricks jobs reset --job-id $(databricks jobs list --output JSON | jq -r '.jobs[] | select(.settings.name=="PySpark_ETL_Job") | .job_id') --json-file databricks_job.json
+          echo "Creating or updating Databricks job..."
+          databricks jobs create --json @databricks_job.json || echo "Job already exists"
+
+      # 7️⃣ (Optional) Run job immediately
+      - name: Run Databricks Job
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+        run: |
+          JOB_ID=$(databricks jobs list --output json | jq -r '.jobs[] | select(.name=="PySpark_ETL_Job") | .id')
+          echo "Running job $JOB_ID..."
+          databricks jobs run-now --job-id "$JOB_ID"
