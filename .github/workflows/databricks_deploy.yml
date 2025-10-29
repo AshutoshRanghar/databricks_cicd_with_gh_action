@@ -33,7 +33,6 @@ jobs:
         run: |
           curl -fsSL https://raw.githubusercontent.com/databricks/cli/main/install.sh | bash
           echo "CLI installed successfully"
-          databricks version
 
       # 5️⃣ Upload wheel to DBFS
       - name: Upload wheel to DBFS
