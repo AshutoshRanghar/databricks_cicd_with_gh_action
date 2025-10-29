@@ -26,6 +26,7 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install -r requirements.txt
           python setup.py bdist_wheel
+          sudo apt-get update && sudo apt-get install -y jq
           ls -lh dist/
 
       # 4️⃣ Install NEW Databricks CLI
@@ -64,13 +65,20 @@ jobs:
 #          databricks jobs run-now --job-id "$JOB_ID"
 
 
-      # 7️⃣ Run job immediately
-      - name: Run Databricks Job
+      # 6️⃣ Deploy Databricks Job (Create or Reset)
+      - name: Deploy Databricks Job (Create or Reset)
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
-          # The 'jobs list' command returns 'job_id', not 'id'.
-          JOB_ID=$(databricks jobs list --output json | jq -r '.jobs[] | select(.name=="PySpark_ETL_Job") | .job_id')
-          echo "Running job $JOB_ID..."
-          databricks jobs run-now --job-id "$JOB_ID"
+          JOB_NAME="PySpark_ETL_Job"
+          # Check if the job already exists
+          JOB_ID=$(databricks jobs list --output json | jq -r '.jobs[] | select(.name=="'${JOB_NAME}'") | .job_id')
+
+          if [ -z "$JOB_ID" ]; then
+            echo "Job not found. Creating new job..."
+            databricks jobs create --json @databricks_job.json
+          else
+            echo "Job ID $JOB_ID found. Updating existing job..."
+            databricks jobs reset --job-id "$JOB_ID" --json @databricks_job.json
+          fi
