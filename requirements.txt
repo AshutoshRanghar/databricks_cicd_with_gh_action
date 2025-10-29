@@ -5,13 +5,6 @@ pyspark>=3.3.0
 delta-spark>=2.4.0
 
 # ========================
-# Databricks CLI (new version)
-# ========================
-# New CLI (v0.205+) supports JSON-based APIs and replaces the deprecated one.
-# You can still pin to this version for stability in CI/CD.
-databricks-cli==0.205.0
-
-# ========================
 # Packaging / Build Tools
 # ========================
 setuptools>=68.0.0
