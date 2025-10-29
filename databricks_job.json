@@ -11,7 +11,7 @@
     }
   ],
   "python_wheel_task": {
-    "package_name": "pyspark-project",
+    "package_name": "pyspark_project",
     "entry_point": "etl_job",
     "parameters": []
   },
