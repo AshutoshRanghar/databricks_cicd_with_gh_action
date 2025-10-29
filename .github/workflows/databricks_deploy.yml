@@ -40,7 +40,7 @@ jobs:
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
           # Install the latest new Databricks CLI
-          pip install databricks-cli==0.205.0
+          # pip install databricks-cli==0.205.0
 
           # Upload the wheel file to DBFS
           WHL_PATH=$(ls dist/*.whl)
