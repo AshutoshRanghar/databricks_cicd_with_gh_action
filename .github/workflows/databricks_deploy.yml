@@ -46,7 +46,9 @@ jobs:
         run: |
           WHEEL_PATH=$(ls dist/*.whl | head -n 1)
           echo "Uploading $WHEEL_PATH to DBFS..."
+          databricks fs mkdirs dbfs:/FileStore/wheels
           databricks fs cp "$WHEEL_PATH" dbfs:/FileStore/wheels/ --overwrite
+
 
       # 7️⃣ Create or Update Databricks Job
       - name: Create or Update Databricks Job
