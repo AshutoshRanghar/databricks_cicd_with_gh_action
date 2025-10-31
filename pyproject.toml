@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "pyspark-project"
+name = "pyspark_project"
 version = "1.0.0"
 description = "Generic PySpark ETL Project for Databricks"
 authors = ["Ashutosh Ranghar <ashutosh@example.com>"]

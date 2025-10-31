@@ -2,7 +2,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, sum as _sum, rank, dense_rank, desc, month, year, to_date,lag,row_number
 from pyspark.sql.window import Window
 
-def main():
+def entry_point():
     spark=SparkSession.builder.getOrCreate()
     data = [
         ("E1", "Sales", "2025-01-05", 100),
@@ -30,4 +30,4 @@ def main():
     source_df.show()
 
 if __name__ == "__main__":
-    main()
+    entry_point()
