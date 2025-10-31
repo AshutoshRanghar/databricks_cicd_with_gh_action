@@ -63,9 +63,9 @@ jobs:
 
           if [ -z "$EXISTING_JOB_ID" ] || [ "$EXISTING_JOB_ID" == "null" ]; then
             echo "Job not found. Creating a new one..."
-            CREATE_OUTPUT=$(databricks jobs create --json @databricks_job.json)
+            CREATE_OUTPUT=$(databricks jobs create --json-file databricks_job.json)
             JOB_ID=$(echo "$CREATE_OUTPUT" | jq -r '.job_id')
-            echo "✅ Created new job with ID $JOB_ID"
+            echo "Created new job with ID $JOB_ID"
           else
             echo "Job already exists with ID $EXISTING_JOB_ID. Updating it..."
             databricks jobs reset --job-id "$EXISTING_JOB_ID" --json @databricks_job.json
