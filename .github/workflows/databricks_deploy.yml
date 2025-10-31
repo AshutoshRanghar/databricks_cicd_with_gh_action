@@ -50,7 +50,6 @@ jobs:
       # 4️⃣ Install NEW Databricks CLI (v0.205+)
       - name: Install Databricks CLI (new)
         run: |
-#          curl -fsSL https://raw.githubusercontent.com/databricks/cli/main/install.sh | bash
           pip install databricks-cli
           echo "CLI installed successfully"
           databricks --version
