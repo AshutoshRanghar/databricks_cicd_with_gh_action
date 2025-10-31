@@ -12,7 +12,7 @@
   ],
   "python_wheel_task": {
     "package_name": "pyspark_project",
-    "entry_point": "etl_job",
+    "entry_point": "pyspark_project.etl_job",
     "parameters": []
   },
   "max_concurrent_runs": 1
