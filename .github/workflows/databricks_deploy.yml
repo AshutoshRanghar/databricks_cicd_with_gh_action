@@ -85,7 +85,8 @@ jobs:
             echo "Created new job with ID $JOB_ID"
           else
             echo "Job already exists with ID $EXISTING_JOB_ID. Updating it..."
-            databricks jobs reset --job-id "$EXISTING_JOB_ID" --json @databricks_job.json
+#            databricks jobs reset --job-id "$EXISTING_JOB_ID" --json @databricks_job.json
+            databricks jobs update --job-id "$EXISTING_JOB_ID" --json-file databricks_job.json
             JOB_ID="$EXISTING_JOB_ID"
             echo "✅ Updated job with ID $JOB_ID"
           fi
