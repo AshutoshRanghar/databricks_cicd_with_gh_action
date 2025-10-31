@@ -10,7 +10,7 @@ packages = [{ include = "pyspark_project", from ="src" }]
 python = ">=3.10,<3.12"
 pyspark = ">=3.3.0"
 delta-spark = ">=2.4.0"
-databricks-cli = "0.18.0"
+databricks-cli = "^0.205.0"
 PyYAML = ">=6.0"
 pandas = ">=2.0.0"
 numpy = ">=1.23.0"

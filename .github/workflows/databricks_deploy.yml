@@ -52,6 +52,7 @@ jobs:
         run: |
           curl -fsSL https://raw.githubusercontent.com/databricks/cli/main/install.sh | bash
           echo "CLI installed successfully"
+          pip install databricks-cli==0.205.0
           databricks --version
 
       # 6️⃣ Upload wheel to DBFS

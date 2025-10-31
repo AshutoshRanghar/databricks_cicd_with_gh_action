@@ -4,7 +4,7 @@
 pyspark>=3.3.0
 delta-spark>=2.4.0
 
-databricks-cli==0.18.0
+databricks-cli=="^0.205.0"
 # ========================
 # Packaging / Build Tools
 # ========================
